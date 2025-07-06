@@ -1,6 +1,7 @@
 import { Storage } from "@google-cloud/storage";
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
+import path from 'path';
 
 
 const storage = new Storage();
@@ -27,7 +28,7 @@ export function setupDirectories() {
  */
 export function convertVideo(rawVideoName: string, processedVideoName: string) {
   return new Promise<void>((resolve, reject) => {
-    ffmpeg(`${localRawVideoPath}/${rawVideoName}`)
+    ffmpeg(path.join(localRawVideoPath, rawVideoName))
       .outputOptions("-vf", "scale=-1:360") // 360p
       .on("end", function () {
         console.log("Processing finished successfully");
@@ -37,7 +38,7 @@ export function convertVideo(rawVideoName: string, processedVideoName: string) {
         console.log("An error occurred: " + err.message);
         reject(err);
       })
-      .save(`${localProcessedVideoPath}/${processedVideoName}`);
+      .save(path.join(localProcessedVideoPath, processedVideoName));
   });
 }
 
@@ -51,11 +52,11 @@ export async function downloadRawVideo(fileName: string) {
   await storage.bucket(rawVideoBucketName)
     .file(fileName)
     .download({
-      destination: `${localRawVideoPath}/${fileName}`,
+      destination: path.join(localRawVideoPath, fileName),
     });
 
   console.log(
-    `gs://${rawVideoBucketName}/${fileName} downloaded to ${localRawVideoPath}/${fileName}.`
+    `gs://${rawVideoBucketName}/${fileName} downloaded to ${path.join(localRawVideoPath, fileName)}.`
   );
 }
 
@@ -70,11 +71,11 @@ export async function uploadProcessedVideo(fileName: string) {
 
   // Upload video to the bucket
   await storage.bucket(processedVideoBucketName)
-    .upload(`${localProcessedVideoPath}/${fileName}`, {
+    .upload(path.join(localProcessedVideoPath, fileName), {
       destination: fileName,
     });
   console.log(
-    `${localProcessedVideoPath}/${fileName} uploaded to gs://${processedVideoBucketName}/${fileName}.`
+    `${path.join(localProcessedVideoPath, fileName)} uploaded to gs://${processedVideoBucketName}/${fileName}.`
   );
 
   // Set the video to be publicly readable
@@ -89,7 +90,7 @@ export async function uploadProcessedVideo(fileName: string) {
  * 
  */
 export function deleteRawVideo(fileName: string) {
-  return deleteFile(`${localRawVideoPath}/${fileName}`);
+  return deleteFile(path.join(localRawVideoPath, fileName));
 }
 
 
@@ -100,7 +101,7 @@ export function deleteRawVideo(fileName: string) {
 * 
 */
 export function deleteProcessedVideo(fileName: string) {
-  return deleteFile(`${localProcessedVideoPath}/${fileName}`);
+  return deleteFile(path.join(localProcessedVideoPath, fileName));
 }
 
 
