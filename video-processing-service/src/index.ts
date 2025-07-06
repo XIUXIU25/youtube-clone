@@ -2,26 +2,31 @@ import express from 'express';
 import ffmpeg from 'fluent-ffmpeg';
 
 const app = express();
+app.use(express.json());
 
-app.post('/process-video', (req,res) => {
-    const inputFilePath = req.body.inputFilePath; // Assuming you're using a middleware like multer to handle file uploads  
-    const outputFilePath = req.body.outputFilePath; // Default output file name
+app.post('/process-video', (req, res) => {
+  console.log('Received request to process video');
+  const inputFilePath = req.body.inputFilePath;
+  const outputFilePath = req.body.outputFilePath;
 
-   ffmpeg(inputFilePath)
-    .outputOptions("-vf", "scale=-1:360") // Example filter to resize video
-    .on('end', () => {
-    res.status(200).send('Video processing completed successfully');
+  ffmpeg(inputFilePath)
+    .outputOptions('-vf', 'scale=trunc(iw*360/ih/2)*2:360') // 360p
+    .on('start', function(commandLine) {
+      console.log('Spawned FFmpeg with command:', commandLine);
     })
-    .on('error', (err) => {
-      console.error(`Error processing video: ${err.message}`);
-      return res.status(500).send('Internal Server Error: ' + err.message);
+    .on('end', function() {
+      console.log('Processing finished successfully');
+      res.status(200).send('Processing finished successfully');
+    })
+    .on('error', function(err: any, stdout: any, stderr: any) {
+      console.error('FFmpeg error:', err.message);
+      console.error('FFmpeg stderr:', stderr);
+      res.status(500).send('FFmpeg failed: ' + err.message);
     })
     .save(outputFilePath);
-    
 });
 
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Video Processing Service is running on port ${PORT}`);
-}); 
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
