@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                       // Good for modern JS features
+    "module": "commonjs",                 // Fine for Node.js, change to "ESNext" if using ESM
+    "outDir": "dist",                     // Compiled files go here
+    "rootDir": "src",                     // Source files live here
+    "strict": true,                       // Enables all strict type checks
+    "esModuleInterop": true,             // Allows default imports from CommonJS
+    "skipLibCheck": true,                // Speeds up build by skipping type checks on node_modules
+    "forceConsistentCasingInFileNames": true // Prevents case-related import issues
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
