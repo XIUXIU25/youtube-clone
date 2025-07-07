@@ -5,10 +5,10 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User 
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "your apiKey",
-  authDomain: "<your authDomain",
-  projectId: "<your projectId",
-  appId: "<your appId>"
+  apiKey: "AIzaSyCSUfoaeJDghFYMVfVF4ONbioRz7GdcBio",
+  authDomain: "noble-linker-465117-i1.firebaseapp.com",
+  projectId: "noble-linker-465117-i1",
+  appId: "1:421656306173:web:2591f2a1168f645df07994"
 };
 
 // Initialize Firebase
