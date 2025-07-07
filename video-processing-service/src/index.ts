@@ -1,5 +1,4 @@
-import path from 'path';
-import express, { Request, Response } from 'express';
+import express from 'express';
 
 import { 
   uploadProcessedVideo,
@@ -17,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 // Process a video file from Cloud Storage into 360p
-app.post('/process-video', async (req: Request, res: Response) => {
+app.post('/process-video', async (req, res) => {
 
   // Get the bucket and filename from the Cloud Pub/Sub message
   let data;
@@ -29,7 +28,6 @@ app.post('/process-video', async (req: Request, res: Response) => {
     }
   } catch (error) {
     console.error(error);
-    // return res.status(400).send('Bad Request: missing filename.');
   }
 
   const inputFileName = data.name;
@@ -40,16 +38,12 @@ app.post('/process-video', async (req: Request, res: Response) => {
 
   // Process the video into 360p
   try { 
-    await convertVideo(
-      path.join('raw-videos', inputFileName),
-      path.join('processed-videos', outputFileName)
-    )
+    await convertVideo(inputFileName, outputFileName)
   } catch (err) {
     await Promise.all([
       deleteRawVideo(inputFileName),
       deleteProcessedVideo(outputFileName)
     ]);
-    // return res.status(500).send('Processing failed');
   }
   
   // Upload the processed video to Cloud Storage
@@ -59,8 +53,6 @@ app.post('/process-video', async (req: Request, res: Response) => {
     deleteRawVideo(inputFileName),
     deleteProcessedVideo(outputFileName)
   ]);
-
-  // return res.status(200).send('Processing finished successfully');
 });
 
 const port = process.env.PORT || 3000;

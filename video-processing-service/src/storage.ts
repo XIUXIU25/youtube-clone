@@ -1,13 +1,13 @@
+import path from "path";
 import { Storage } from "@google-cloud/storage";
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
-import path from 'path';
 
 
 const storage = new Storage();
 
-const rawVideoBucketName = "neetcode-yt-raw-videos";
-const processedVideoBucketName = "neetcode-yt-processed-videos";
+const rawVideoBucketName = "xiuxiu-yt-raw-videos";
+const processedVideoBucketName = "xiuxiu-yt-processed-videos";
 
 const localRawVideoPath = "./raw-videos";
 const localProcessedVideoPath = "./processed-videos";
@@ -28,17 +28,25 @@ export function setupDirectories() {
  */
 export function convertVideo(rawVideoName: string, processedVideoName: string) {
   return new Promise<void>((resolve, reject) => {
-    ffmpeg(path.join(localRawVideoPath, rawVideoName))
-      .outputOptions("-vf", "scale=-1:360") // 360p
+    ffmpeg(path.resolve(localRawVideoPath, rawVideoName))
+      .outputOptions(
+    "-vf", "scale=trunc(iw*360/ih/2)*2:360",
+    "-c:v", "libx264",
+    "-c:a", "aac",
+    "-b:a", "128k"
+  ) // 360p
       .on("end", function () {
         console.log("Processing finished successfully");
         resolve();
+      })
+      .on("stderr", function (stderrLine) {
+        console.log("FFmpeg stderr:", stderrLine);
       })
       .on("error", function (err: any) {
         console.log("An error occurred: " + err.message);
         reject(err);
       })
-      .save(path.join(localProcessedVideoPath, processedVideoName));
+      .save(`${localProcessedVideoPath}/${processedVideoName}`);
   });
 }
 
@@ -52,11 +60,11 @@ export async function downloadRawVideo(fileName: string) {
   await storage.bucket(rawVideoBucketName)
     .file(fileName)
     .download({
-      destination: path.join(localRawVideoPath, fileName),
+      destination: `${localRawVideoPath}/${fileName}`,
     });
 
   console.log(
-    `gs://${rawVideoBucketName}/${fileName} downloaded to ${path.join(localRawVideoPath, fileName)}.`
+    `gs://${rawVideoBucketName}/${fileName} downloaded to ${localRawVideoPath}/${fileName}.`
   );
 }
 
@@ -71,11 +79,11 @@ export async function uploadProcessedVideo(fileName: string) {
 
   // Upload video to the bucket
   await storage.bucket(processedVideoBucketName)
-    .upload(path.join(localProcessedVideoPath, fileName), {
+    .upload(`${localProcessedVideoPath}/${fileName}`, {
       destination: fileName,
     });
   console.log(
-    `${path.join(localProcessedVideoPath, fileName)} uploaded to gs://${processedVideoBucketName}/${fileName}.`
+    `${localProcessedVideoPath}/${fileName} uploaded to gs://${processedVideoBucketName}/${fileName}.`
   );
 
   // Set the video to be publicly readable
@@ -90,7 +98,7 @@ export async function uploadProcessedVideo(fileName: string) {
  * 
  */
 export function deleteRawVideo(fileName: string) {
-  return deleteFile(path.join(localRawVideoPath, fileName));
+  return deleteFile(`${localRawVideoPath}/${fileName}`);
 }
 
 
@@ -101,7 +109,7 @@ export function deleteRawVideo(fileName: string) {
 * 
 */
 export function deleteProcessedVideo(fileName: string) {
-  return deleteFile(path.join(localProcessedVideoPath, fileName));
+  return deleteFile(`${localProcessedVideoPath}/${fileName}`);
 }
 
 
