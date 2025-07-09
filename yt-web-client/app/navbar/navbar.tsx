@@ -1,6 +1,7 @@
 'use client';
 
 import SignIn from "./sign-in";
+import Upload from "./upload";
 import Link from "next/link";
 
 import styles from "./navbar.module.css";
@@ -30,6 +31,9 @@ function NavBar() {
           <img className={styles.logo} src="/youtube-logo.svg" alt="YouTube Logo" />
         </span>
       </Link>
+      { 
+      user && <Upload />
+    }
       <SignIn user={user} />
     </nav>
   );
