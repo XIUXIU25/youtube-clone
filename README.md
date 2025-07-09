@@ -1,6 +1,6 @@
 
 
-# YouTube Skeleton Clone 🎥
+# YouTube Skeleton Clone
 
 This is a simplified YouTube clone built as part of my Full Stack Development course. The purpose of this project is to focus on core YouTube functionality—**video uploading, processing, and viewing**—rather than building a full production system.
 ![image](https://github.com/user-attachments/assets/fd978e36-adef-4737-8471-0ad50dcdf730)
