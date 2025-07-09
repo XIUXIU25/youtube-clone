@@ -2,7 +2,7 @@
 
 # YouTube Skeleton Clone
 
-This is a simplified YouTube clone built as part of my Full Stack Development course. The purpose of this project is to focus on core YouTube functionality—**video uploading, processing, and viewing**—rather than building a full production system.
+The purpose of this project is to focus on core YouTube functionality—**video uploading, processing, and viewing**—rather than building a full production system.
 ![image](https://github.com/user-attachments/assets/fd978e36-adef-4737-8471-0ad50dcdf730)
 
 ---
@@ -62,8 +62,3 @@ This is a simplified YouTube clone built as part of my Full Stack Development co
 ## 🚀 Setup & Deployment
 
 > ⚠️ This project assumes you have access to a Firebase + Google Cloud project.
-
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/yourusername/youtube-skeleton-clone.git
-   cd youtube-skeleton-clone
