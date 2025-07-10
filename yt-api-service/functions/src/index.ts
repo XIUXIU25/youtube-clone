@@ -12,11 +12,23 @@ initializeApp();
 const firestore = new Firestore();
 const storage = new Storage();
 const rawVideoBucketName = "xiuxiu-yt-raw-videos";
+const videoCollectionId = "videos";
 
 // export const helloWorld = onRequest((request, response) => {
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+export interface Video {
+  id?: string,
+  uid?: string,
+  filename?: string,
+  status?: "processing" | "processed",
+  title?: string,
+  description?: string
+}
+
+
 export const createUser = functions.auth.user().onCreate((
   user: functions.auth.UserRecord) => {
   const userInfo = {
@@ -39,6 +51,7 @@ export const generateUploadUrl = onCall({maxInstances: 1}, async (request) => {
     );
   }
 
+
   const auth = request.auth;
   const data = request.data;
   const bucket = storage.bucket(rawVideoBucketName);
@@ -54,4 +67,10 @@ export const generateUploadUrl = onCall({maxInstances: 1}, async (request) => {
   });
 
   return {url, fileName};
+});
+
+export const getVideos = onCall({maxInstances: 1}, async () => {
+  const querySnapshot =
+    await firestore.collection(videoCollectionId).limit(10).get();
+  return querySnapshot.docs.map((doc) => doc.data());
 });
